@@ -16,3 +16,4 @@ jobs:
           api-key: ${{ secrets.HOSTINGER_API_KEY }}
           virtual-machine: ${{ vars.HOSTINGER_VM_ID }}
           project-name: transcript-api
+          personal-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
