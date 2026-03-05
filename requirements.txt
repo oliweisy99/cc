@@ -3,3 +3,4 @@ uvicorn
 pydantic
 browser-use
 python-dotenv
+youtube_transcript_api
