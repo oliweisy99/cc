@@ -1,0 +1,34 @@
+{
+  "skill_key": "app_kit_com__monthly_kit",
+  "task_type": "monthly_Kit",
+  "domain": "app_kit_com",
+  "curated": false,
+  "original_task": "Go to 'https://app.kit.com/subscribers?tab=NetNew'. Type in the date range from Feb 1, 2026 to Feb 28, 2026.  in the date range selector (Use the following format E.g. Feb 2, 2026 - Feb 9, 2026). Then press enter, then change the days selector to months and this will start to load the graph below. Please wait for the graph to load for 15 seconds after you have entered in the date, pressed enter and changed days to months in the dropdown. Once the graph appears after you've pressed months and waited 15 seconds, hover over the graph and a box will appears with 3 figures. If the box does not appear, try clicking the graph instead. if that doesn't work, scroll up to see the full chart, then take a screenshot to visually identify the chart data area and tooltip location. The box that appears will include new subscribers, cancellations and net new subscribes. Copy those 3 figures and please return them.",
+  "last_updated": "2026-03-01T16:56:00.275606",
+  "run_count": 1,
+  "action_sequence": [
+    "navigate",
+    "click",
+    "click",
+    "click",
+    "send_keys",
+    "click",
+    "click",
+    "wait",
+    "evaluate",
+    "click",
+    "done"
+  ],
+  "step_descriptions": [
+    "Step 1:\nActions: [\n {\n  \"navigate\": {\n   \"url\": \"https://app.kit.com/subscribers?tab=NetNew\",\n   \"new_tab\": false\n  }\n }\n]\nResult 1: 🔗 Navigated to https://app.kit.com/subscribers?tab=NetNew\n",
+    "Step 2:\nActions: [\n {\n  \"click\": {\n   \"index\": 72\n  }\n }\n]\nResult 1: Clicked div \"Mar 1, 2026\"\n",
+    "Step 3:\nActions: [\n {\n  \"click\": {\n   \"index\": 74\n  }\n }\n]\nResult 1: Clicked i\n",
+    "Step 4:\nActions: [\n {\n  \"click\": {\n   \"index\": 1558\n  }\n }\n]\nResult 1: Clicked li \"28\"\n",
+    "Step 5:\nActions: [\n {\n  \"send_keys\": {\n   \"keys\": \"Enter\"\n  }\n },\n {\n  \"click\": {\n   \"index\": 69\n  }\n }\n]\nResult 1: Sent keys: Enter\nResult 2: Clicked div role=combobox \"Days\" aria-label=Select time interval\n",
+    "Step 6:\nActions: [\n {\n  \"click\": {\n   \"index\": 2154\n  }\n },\n {\n  \"wait\": {\n   \"seconds\": 15\n  }\n }\n]\nResult 1: Clicked button role=option \"Months\"\nResult 2: Waited for 15 seconds\n",
+    "Step 7:\nActions: [\n {\n  \"evaluate\": {\n   \"code\": \"(function(){try{const chart=document.querySelector('svg');if(!chart)return 'No SVG found';const rect=chart.getBoundingClientRect();const centerX=rect.left+rect.width/2;const centerY=rect.top+rect.height/2;const hoverEvent=new MouseEvent('mousemove',{bubbles:true,cancelable:true,view:window,clientX:centerX,clientY:centerY});chart.dispatchEvent(hoverEvent);return 'Hover event dispatched at '+centerX+','+centerY}catch(e){return 'Error: '+e.message}})()\"\n  }\n }\n]\nResult 1: Hover event dispatched at 58.98828125,28\n",
+    "Step 8:\nActions: [\n {\n  \"click\": {\n   \"coordinate_x\": 788,\n   \"coordinate_y\": 700\n  }\n }\n]\nResult 1: Clicked on coordinate 788, 700\n",
+    "Step 9:\nActions: [\n {\n  \"done\": {\n   \"text\": \"I successfully retrieved the 3 figures from the Kit subscribers graph for the date range Feb 1, 2026 - Feb 28, 2026:\\n\\n**New Subscribers:** 5,297\\n**Cancellations:** 1,570\\n**Net New Subscribers:** 3,727\",\n   \"success\": true,\n   \"files_to_display\": []\n  }\n }\n]\nResult 1: I successfully retrieved the 3 figures from the Kit subscribers graph for the date range Feb 1, 2026 - Feb 28, 2026:\n\n**New Subscribers:** 5,297\n**Cancellations:** 1,570\n**Net New Subscribers:** 3,727\n"
+  ],
+  "final_result_summary": "I successfully retrieved the 3 figures from the Kit subscribers graph for the date range Feb 1, 2026 - Feb 28, 2026:\n\n**New Subscribers:** 5,297\n**Cancellations:** 1,570\n**Net New Subscribers:** 3,727"
+}

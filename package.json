@@ -1,0 +1,22 @@
+{
+  "name": "course-concierge-data-automation",
+  "version": "1.0.0",
+  "description": "Intelligent AI-powered weekly data report automation for creator businesses",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.3",
+    "@google-analytics/data": "^4.8.0",
+    "axios": "^1.7.9",
+    "browser-use-sdk": "^2.0.15",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

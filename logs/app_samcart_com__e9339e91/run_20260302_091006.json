@@ -1,0 +1,33 @@
+{
+  "task": "Go to https://app.samcart.com/marketplace/pauldavids/analytics/products. Set date range from Feb 23, 2026 to Mar 1, 2026. To change the date, type it in the field rather than trying to select the specific dates on the date selector calendar as sam cart is quite fiddly (E.g. for the date, it is formatted like this: 'Feb 10, 2026' so don't use this formatting: '2026-02-10'). There are two date selectors so choose the second one as that one changes the table data. Once you have typed it in, you then need to click off the date selector on the page for it to reload the table data with the new data. Return the orders for each product. The orders number is the number on the orders column. Ensure you select only this number and do so correctly. For context, it is the column inbetween 'Views' and 'Conversions'. Click through the paginator at bottom of table to make sure you get all data from the table.",
+  "skill_key": "app_samcart_com__e9339e91",
+  "used_existing_skill": false,
+  "success": true,
+  "action_names": [
+    "navigate",
+    "wait",
+    "scroll",
+    "scroll",
+    "scroll",
+    "input",
+    "input",
+    "click",
+    "scroll",
+    "scroll",
+    "scroll",
+    "scroll",
+    "scroll",
+    "click",
+    "scroll",
+    "scroll",
+    "scroll",
+    "click",
+    "extract",
+    "click",
+    "extract",
+    "done"
+  ],
+  "final_result": "Here are the orders for each product from Feb 23, 2026 to Mar 1, 2026:\n\n**Page 1 Products:**\n1. Acoustic Adventure: 34 orders\n2. Acoustic Adventure (Order Bump): 11 orders\n3. Acoustic Adventure (Payment Plan): 6 orders\n4. Coaching Club (Early Annual): 0 orders\n5. Coaching Club (Monthly - 1st Month Free): 17 orders\n6. Coaching Club (Monthly - 3 Months Free): 0 orders\n7. Coaching Club (Monthly): 0 orders\n8. Electric Elevation: 7 orders\n9. Electric Elevation (Order Bump): 8 orders\n10. Electric Elevation (Payment Plan): 1 order\n\n**Page 2 Products:**\n11. Learn Practice Play: 36 orders\n12. Learn Practice Play (Order Bump): 0 orders\n13. Learn Practice Play (Payment Plan): 3 orders\n14. Loop School: 4 orders\n15. Loop School (Order Bump): 5 orders\n16. Next Level Playing: 27 orders\n17. Next Level Playing (Order Bump): 10 orders\n18. Next Level Playing (Payment Plan): 6 orders\n\n**Total: 18 products with a combined 175 orders for the period Feb 23, 2026 - Mar 1, 2026**",
+  "duration_seconds": 595.191,
+  "errors": []
+}

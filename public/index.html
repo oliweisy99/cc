@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course Concierge — AI Data Reports</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ─── Header ─────────────────────────────────────────────────────────── -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <div>
+          <h1>Course Concierge</h1>
+          <p>AI-Powered Weekly Data Reports</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost" onclick="showCacheViewer()">View Cache</button>
+        <button class="btn btn-ghost" onclick="showManualOverride()">Manual Override</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Main layout ──────────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- Left: Client cards -->
+    <aside class="sidebar">
+      <h2>Clients</h2>
+      <div id="client-list">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </aside>
+
+    <!-- Right: Activity panel -->
+    <section class="activity-panel">
+
+      <!-- Empty state -->
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">🤖</div>
+        <h3>Select a client and click "Run Report"</h3>
+        <p>The AI will read the Google Sheet, figure out what data to fetch,<br>
+           call Google Analytics and SamCart, then write a new row automatically.</p>
+      </div>
+
+      <!-- Active report panel (hidden until a run starts) -->
+      <div id="report-panel" class="report-panel hidden">
+
+        <!-- Status timeline -->
+        <div class="panel-header">
+          <div class="panel-title-row">
+            <h2 id="active-client-name">Running report…</h2>
+            <div id="run-badge" class="badge badge-running">Running</div>
+          </div>
+          <div class="step-progress">
+            <div class="step-dot" data-step="1" title="Read Sheet">1</div>
+            <div class="step-line"></div>
+            <div class="step-dot" data-step="2" title="AI Analysis">2</div>
+            <div class="step-line"></div>
+            <div class="step-dot" data-step="3" title="Fetch APIs">3</div>
+            <div class="step-line"></div>
+            <div class="step-dot" data-step="4" title="Format Data">4</div>
+            <div class="step-line"></div>
+            <div class="step-dot" data-step="5" title="Write Sheet">5</div>
+            <div class="step-line"></div>
+            <div class="step-dot" data-step="6" title="Validate">6</div>
+          </div>
+        </div>
+
+        <!-- Live log stream -->
+        <div class="section">
+          <div class="section-label">AI Reasoning Log</div>
+          <div id="status-log" class="log-container"></div>
+        </div>
+
+        <!-- Results accordion -->
+        <div id="results-accordion" class="accordion hidden">
+
+          <!-- Sheet structure -->
+          <div class="accordion-item" id="acc-sheet">
+            <button class="accordion-header" onclick="toggleAccordion('acc-sheet')">
+              <span>📊 Sheet Structure Detected</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <div id="sheet-data-display"></div>
+            </div>
+          </div>
+
+          <!-- AI Schema -->
+          <div class="accordion-item" id="acc-schema">
+            <button class="accordion-header" onclick="toggleAccordion('acc-schema')">
+              <span>🧠 AI Column Analysis</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <div id="schema-display"></div>
+            </div>
+          </div>
+
+          <!-- Fetched data -->
+          <div class="accordion-item" id="acc-data">
+            <button class="accordion-header" onclick="toggleAccordion('acc-data')">
+              <span>📡 Fetched API Data</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <div id="api-data-display"></div>
+            </div>
+          </div>
+
+          <!-- New row -->
+          <div class="accordion-item" id="acc-row">
+            <button class="accordion-header" onclick="toggleAccordion('acc-row')">
+              <span>✍️ New Row Written</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <div id="row-display"></div>
+            </div>
+          </div>
+
+          <!-- Validation -->
+          <div class="accordion-item" id="acc-validation">
+            <button class="accordion-header" onclick="toggleAccordion('acc-validation')">
+              <span>✅ Self-Validation</span>
+              <span class="accordion-arrow">▼</span>
+            </button>
+            <div class="accordion-body">
+              <div id="validation-display"></div>
+            </div>
+          </div>
+
+        </div><!-- /accordion -->
+      </div><!-- /report-panel -->
+
+    </section>
+  </main>
+
+  <!-- ─── Modals ────────────────────────────────────────────────────────────── -->
+
+  <!-- Cache viewer modal -->
+  <div id="modal-cache" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal('modal-cache')"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Analysis Cache</h3>
+        <button class="modal-close" onclick="closeModal('modal-cache')">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-hint">Cached schemas prevent re-running Claude analysis on every report. Delete to force re-analysis.</p>
+        <div id="cache-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual Override modal -->
+  <div id="modal-override" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal('modal-override')"></div>
+    <div class="modal-content modal-wide">
+      <div class="modal-header">
+        <h3>Manual Schema Override</h3>
+        <button class="modal-close" onclick="closeModal('modal-override')">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-hint">Paste a custom schema JSON to override what Claude detected. This will be saved as the cached analysis for the selected client.</p>
+        <label>Client</label>
+        <select id="override-client-select" class="input"></select>
+        <label>Schema JSON</label>
+        <textarea id="override-schema-input" class="input code-input" rows="20" placeholder='{ "columns": [...], "fetch_plan": {...} }'></textarea>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal('modal-override')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveOverride()">Save Override</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ─── State ──────────────────────────────────────────────────────────────────
+  let clients = [];
+  let activeClientId = null;
+  let currentEventSource = null;
+
+  // ─── Boot ────────────────────────────────────────────────────────────────────
+  async function init() {
+    await loadClients();
+  }
+
+  async function loadClients() {
+    try {
+      const res = await fetch('/api/clients');
+      clients = await res.json();
+      renderClientList();
+    } catch (e) {
+      document.getElementById('client-list').innerHTML =
+        `<div class="error-msg">Failed to load clients: ${e.message}</div>`;
+    }
+  }
+
+  // ─── Client list render ──────────────────────────────────────────────────────
+  function renderClientList() {
+    const el = document.getElementById('client-list');
+    el.innerHTML = '';
+
+    clients.forEach(client => {
+      const card = document.createElement('div');
+      card.className = 'client-card';
+      card.id = `card-${client.id}`;
+
+      const cacheTag = client.hasCachedAnalysis
+        ? `<span class="tag tag-cached" title="Cached analysis from ${new Date(client.cachedAt).toLocaleString()}">Cached ✓</span>`
+        : `<span class="tag tag-uncached">No cache</span>`;
+
+      card.innerHTML = `
+        <div class="client-info">
+          <div class="client-name">${client.name}</div>
+          <div class="client-meta">
+            <span class="tag tag-sheet" title="${client.sheetId || 'Not set'}">
+              ${client.sheetId ? '📄 Sheet connected' : '⚠️ No Sheet ID'}
+            </span>
+            ${cacheTag}
+          </div>
+        </div>
+        <div class="client-actions">
+          <button class="btn btn-primary btn-run" onclick="startReport('${client.id}', false)">
+            Run Report
+          </button>
+          ${client.hasCachedAnalysis
+            ? `<button class="btn btn-ghost btn-sm" onclick="startReport('${client.id}', true)" title="Re-analyse sheet with Claude">
+                Re-analyze
+               </button>`
+            : ''}
+        </div>
+      `;
+      el.appendChild(card);
+    });
+  }
+
+  // ─── Run report ──────────────────────────────────────────────────────────────
+  function startReport(clientId, reanalyze) {
+    // Cancel any running stream
+    if (currentEventSource) {
+      currentEventSource.close();
+      currentEventSource = null;
+    }
+
+    activeClientId = clientId;
+    const client = clients.find(c => c.id === clientId);
+
+    // Reset UI
+    resetReportPanel();
+    document.getElementById('empty-state').classList.add('hidden');
+    document.getElementById('report-panel').classList.remove('hidden');
+    document.getElementById('active-client-name').textContent = `${client.name} — Running Report`;
+    document.getElementById('run-badge').className = 'badge badge-running';
+    document.getElementById('run-badge').textContent = 'Running';
+
+    // Mark the active card
+    document.querySelectorAll('.client-card').forEach(c => c.classList.remove('active'));
+    document.getElementById(`card-${clientId}`)?.classList.add('active');
+
+    // Open SSE stream
+    const url = `/api/run-report/${clientId}${reanalyze ? '?reanalyze=true' : ''}`;
+    const es = new EventSource(url);
+    currentEventSource = es;
+
+    es.addEventListener('status', (e) => {
+      const data = JSON.parse(e.data);
+      appendLog(data);
+      if (data.step) highlightStep(data.step);
+    });
+
+    es.addEventListener('sheet_data', (e) => {
+      const data = JSON.parse(e.data);
+      renderSheetData(data);
+    });
+
+    es.addEventListener('schema', (e) => {
+      const data = JSON.parse(e.data);
+      renderSchema(data);
+    });
+
+    es.addEventListener('ga_data', (e) => {
+      const data = JSON.parse(e.data);
+      appendApiData('Google Analytics', data.summary);
+    });
+
+    es.addEventListener('samcart_data', (e) => {
+      const data = JSON.parse(e.data);
+      appendApiData('SamCart', JSON.stringify(data.summary));
+    });
+
+    es.addEventListener('formatted_row', (e) => {
+      const data = JSON.parse(e.data);
+      renderFormattedRow(data);
+    });
+
+    es.addEventListener('write_result', (e) => {
+      // Acknowledged — step 5 status message handles the UI update
+    });
+
+    es.addEventListener('validation', (e) => {
+      const data = JSON.parse(e.data);
+      renderValidation(data);
+    });
+
+    es.addEventListener('complete', (e) => {
+      const data = JSON.parse(e.data);
+      onComplete(data);
+      es.close();
+    });
+
+    es.addEventListener('error', (e) => {
+      let msg = 'Unknown error';
+      try { msg = JSON.parse(e.data).message; } catch (_) {}
+      appendLog({ message: `ERROR: ${msg}`, error: true });
+      document.getElementById('run-badge').className = 'badge badge-error';
+      document.getElementById('run-badge').textContent = 'Failed';
+      es.close();
+    });
+
+    es.onerror = () => {
+      if (es.readyState === EventSource.CLOSED) return; // normal close
+      appendLog({ message: 'Connection to server lost.', error: true });
+    };
+  }
+
+  // ─── UI helpers ──────────────────────────────────────────────────────────────
+
+  function resetReportPanel() {
+    document.getElementById('status-log').innerHTML = '';
+    document.getElementById('sheet-data-display').innerHTML = '';
+    document.getElementById('schema-display').innerHTML = '';
+    document.getElementById('api-data-display').innerHTML = '';
+    document.getElementById('row-display').innerHTML = '';
+    document.getElementById('validation-display').innerHTML = '';
+    document.getElementById('results-accordion').classList.add('hidden');
+    document.querySelectorAll('.step-dot').forEach(d => {
+      d.classList.remove('active', 'done');
+    });
+  }
+
+  function appendLog(data) {
+    const log = document.getElementById('status-log');
+    const line = document.createElement('div');
+    line.className = `log-line${data.error ? ' log-error' : ''}${data.warning ? ' log-warning' : ''}`;
+
+    const now = new Date().toLocaleTimeString();
+    const stepBadge = data.step ? `<span class="log-step">Step ${data.step}</span>` : '';
+    const icon = data.error ? '✗' : data.warning ? '⚠' : data.cached ? '📦' : '→';
+
+    line.innerHTML = `
+      <span class="log-time">${now}</span>
+      ${stepBadge}
+      <span class="log-icon">${icon}</span>
+      <span class="log-text">${escHtml(data.message)}</span>
+    `;
+
+    if (data.details) {
+      const det = document.createElement('div');
+      det.className = 'log-detail';
+      if (data.details.gaCols?.length) det.innerHTML += `<span class="tag tag-ga">GA: ${data.details.gaCols.join(', ')}</span>`;
+      if (data.details.scCols?.length) det.innerHTML += `<span class="tag tag-sc">SamCart: ${data.details.scCols.join(', ')}</span>`;
+      if (data.details.calcCols?.length) det.innerHTML += `<span class="tag tag-calc">Calculated: ${data.details.calcCols.join(', ')}</span>`;
+      line.appendChild(det);
+    }
+
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function highlightStep(step) {
+    document.querySelectorAll('.step-dot').forEach(d => {
+      const s = parseInt(d.dataset.step);
+      if (s < step) d.classList.add('done'), d.classList.remove('active');
+      else if (s === step) d.classList.add('active'), d.classList.remove('done');
+      else d.classList.remove('active', 'done');
+    });
+  }
+
+  function renderSheetData({ headers, sampleRows }) {
+    document.getElementById('results-accordion').classList.remove('hidden');
+    const el = document.getElementById('sheet-data-display');
+
+    let html = `<div class="data-table-wrap"><table class="data-table"><thead><tr>`;
+    headers.forEach(h => { html += `<th>${escHtml(h)}</th>`; });
+    html += '</tr></thead><tbody>';
+    sampleRows.forEach(row => {
+      html += '<tr>';
+      headers.forEach((_, i) => { html += `<td>${escHtml(row[i] ?? '')}</td>`; });
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    el.innerHTML = html;
+  }
+
+  function renderSchema({ schema, usedCache }) {
+    const el = document.getElementById('schema-display');
+
+    let html = ``;
+    if (usedCache) html += `<div class="info-banner">📦 Using cached analysis — <button class="link-btn" onclick="startReport('${activeClientId}', true)">Re-analyze now</button></div>`;
+
+    html += `<div class="schema-grid">`;
+    schema.columns.forEach(col => {
+      const sourceClass = {
+        google_analytics: 'source-ga',
+        samcart: 'source-sc',
+        calculated: 'source-calc',
+        manual: 'source-manual',
+      }[col.source] || '';
+
+      html += `
+        <div class="schema-col ${sourceClass}">
+          <div class="schema-col-name">${escHtml(col.name)}</div>
+          <div class="schema-col-meta">
+            <span class="tag">${escHtml(col.source)}</span>
+            <span class="tag">${escHtml(col.data_type)}</span>
+            ${col.metric ? `<span class="tag tag-mono">${escHtml(col.metric)}</span>` : ''}
+          </div>
+          ${col.format ? `<div class="schema-col-format">Format: <code>${escHtml(col.format)}</code></div>` : ''}
+          ${col.notes ? `<div class="schema-col-notes">${escHtml(col.notes)}</div>` : ''}
+        </div>`;
+    });
+    html += '</div>';
+
+    html += `<details class="raw-json"><summary>Raw fetch plan JSON</summary><pre>${escHtml(JSON.stringify(schema.fetch_plan, null, 2))}</pre></details>`;
+    el.innerHTML = html;
+  }
+
+  function appendApiData(source, summary) {
+    const el = document.getElementById('api-data-display');
+    el.innerHTML += `
+      <div class="api-block">
+        <div class="api-block-header">${escHtml(source)}</div>
+        <pre class="api-block-body">${escHtml(typeof summary === 'string' ? summary : JSON.stringify(summary, null, 2))}</pre>
+      </div>`;
+  }
+
+  function renderFormattedRow({ row, columnNames }) {
+    const el = document.getElementById('row-display');
+    let html = '<div class="row-cells">';
+    row.forEach((val, i) => {
+      html += `
+        <div class="row-cell">
+          <div class="row-cell-col">${escHtml(columnNames[i] || `Col ${i}`)}</div>
+          <div class="row-cell-val">${escHtml(String(val ?? '—'))}</div>
+        </div>`;
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  function renderValidation({ writtenRow, intendedRow, discrepancies }) {
+    const el = document.getElementById('validation-display');
+
+    if (discrepancies.length === 0) {
+      el.innerHTML = '<div class="success-banner">✅ All cells match the intended values.</div>';
+    } else {
+      let html = `<div class="warning-banner">⚠️ ${discrepancies.length} discrepancy(ies) detected (often just formatting differences):</div>`;
+      html += '<table class="data-table"><thead><tr><th>Column</th><th>Intended</th><th>Written</th></tr></thead><tbody>';
+      discrepancies.forEach(d => {
+        html += `<tr><td>${escHtml(d.column)}</td><td>${escHtml(d.intended)}</td><td>${escHtml(d.written)}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    }
+  }
+
+  function onComplete({ clientName, rowWritten, discrepancies }) {
+    document.getElementById('run-badge').className = 'badge badge-success';
+    document.getElementById('run-badge').textContent = '✓ Complete';
+    document.getElementById('active-client-name').textContent = `${clientName} — Report Complete`;
+
+    // Mark all steps done
+    document.querySelectorAll('.step-dot').forEach(d => {
+      d.classList.add('done');
+      d.classList.remove('active');
+    });
+
+    // Refresh client list to update cache badge
+    loadClients().then(() => {
+      document.querySelectorAll('.client-card').forEach(c => c.classList.remove('active'));
+      document.getElementById(`card-${activeClientId}`)?.classList.add('active');
+    });
+  }
+
+  // ─── Accordions ──────────────────────────────────────────────────────────────
+  function toggleAccordion(id) {
+    const item = document.getElementById(id);
+    item.classList.toggle('open');
+  }
+
+  // ─── Cache viewer modal ───────────────────────────────────────────────────────
+  async function showCacheViewer() {
+    const res = await fetch('/api/cache');
+    const cache = await res.json();
+    const el = document.getElementById('cache-content');
+
+    const keys = Object.keys(cache);
+    if (keys.length === 0) {
+      el.innerHTML = '<p>No cached analyses yet.</p>';
+    } else {
+      el.innerHTML = keys.map(key => {
+        const entry = cache[key];
+        const [clientId] = key.split(':');
+        return `
+          <div class="cache-entry">
+            <div class="cache-entry-header">
+              <strong>${escHtml(key)}</strong>
+              <span class="cache-date">Cached: ${new Date(entry.cachedAt).toLocaleString()}</span>
+              ${entry.manual ? '<span class="tag tag-manual">Manual</span>' : ''}
+            </div>
+            <div class="cache-entry-cols">
+              ${(entry.schema?.columns || []).map(c =>
+                `<span class="tag">${escHtml(c.name)}</span>`
+              ).join(' ')}
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="deleteCache('${escHtml(clientId)}')">
+              Delete Cache
+            </button>
+          </div>`;
+      }).join('');
+    }
+
+    openModal('modal-cache');
+  }
+
+  async function deleteCache(clientId) {
+    await fetch(`/api/cache/${clientId}`, { method: 'DELETE' });
+    await loadClients();
+    showCacheViewer();
+  }
+
+  // ─── Manual override modal ────────────────────────────────────────────────────
+  function showManualOverride() {
+    const sel = document.getElementById('override-client-select');
+    sel.innerHTML = clients.map(c =>
+      `<option value="${c.id}">${escHtml(c.name)}</option>`
+    ).join('');
+    openModal('modal-override');
+  }
+
+  async function saveOverride() {
+    const clientId = document.getElementById('override-client-select').value;
+    const raw = document.getElementById('override-schema-input').value;
+    let schema;
+    try {
+      schema = JSON.parse(raw);
+    } catch (e) {
+      alert('Invalid JSON: ' + e.message);
+      return;
+    }
+    const res = await fetch(`/api/override-schema/${clientId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ schema }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      closeModal('modal-override');
+      await loadClients();
+      alert('Override saved. Next run will use your custom schema.');
+    } else {
+      alert('Error: ' + data.error);
+    }
+  }
+
+  // ─── Modal helpers ────────────────────────────────────────────────────────────
+  function openModal(id) {
+    document.getElementById(id).classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  // ─── Utils ────────────────────────────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────────────────────
+  init();
+  </script>
+</body>
+</html>

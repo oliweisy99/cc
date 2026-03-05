@@ -1,0 +1,37 @@
+{
+  "skill_key": "app_samcart_com__monthly_samcart_orders",
+  "task_type": "monthly_samcart_orders",
+  "domain": "app_samcart_com",
+  "curated": true,
+  "original_task": "Go to https://app.samcart.com/marketplace/pauldavids/analytics/products. Set date range from Feb 1, 2026 to Feb 28, 2026. To change the date, type it in the field rather than trying to select the specific dates on the date selector calendar as sam cart is quite fiddly (E.g. for the date, it is formatted like this: 'Feb 10, 2026' so don't use this formatting: '2026-02-10'). There are two date selectors so choose the second one as that one changes the table data. Once you have typed it in, you then need to click off the date selector on the page for it to reload the table data with the new data. Return the orders for each product. The orders number is the number on the orders column. Ensure you select only this number and do so correctly. For context, it is the column inbetween 'Views' and 'Conversions'. It is not the 'Paypal Orders' or 'Credit card orders' value. Always read order counts directly from the Orders column cell in the analytics table. Do NOT click into any product detail page to count orders. If a cell appears visually empty, extract the raw text content of that cell — the number is in the table. Do not navigate away from the analytics page to verify any figures. Click through the paginator at bottom of table to make sure you get all data from the table.",
+  "last_updated": "2026-03-01T14:21:23.693840",
+  "run_count": 2,
+  "action_sequence": [
+    "navigate",
+    "wait",
+    "scroll",
+    "input",
+    "input",
+    "click",
+    "scroll",
+    "scroll",
+    "click",
+    "scroll",
+    "scroll",
+    "done"
+  ],
+  "step_descriptions": [
+    "Step 1: Navigate to https://app.samcart.com/marketplace/pauldavids/analytics/products",
+    "Step 2: Wait 3 seconds for the page to fully load before interacting.",
+    "Step 3: Scroll down slowly within the main content area to locate the date input fields. The table and date selectors are below the page fold.",
+    "Step 4: Type the start date into the start date input field in 'Mon DD, YYYY' format (e.g. 'Feb 01, 2026'). The field may reformat slightly — that is fine.",
+    "Step 5: Type the end date into the end date input field in 'Mon DD, YYYY' format (e.g. 'Feb 28, 2026').",
+    "Step 6: Click the 'Product' column header (or anywhere outside the date fields) to dismiss the date selector and trigger the table to reload with the new date range.",
+    "Step 7: IMPORTANT — Do NOT navigate to page 2 yet. First, scroll down slowly through the products table on page 1 to visually read every row. For each row you can see, record the value in the Orders column — it is the column directly between 'Views' and 'Conversions'. Do NOT use 'Paypal Orders' or 'Credit card orders'. Scroll until you reach the paginator at the bottom and have seen all rows on page 1.",
+    "Step 8: Once you have recorded ALL rows on page 1, scroll back up slightly to confirm you have not missed any rows, then click the page 2 link in the paginator at the bottom of the table.",
+    "Step 9: On page 2, scroll up to the top of the table first, then scroll down slowly to visually read every row. Record all rows and their Orders column values.",
+    "Step 10: Scroll through page 2 fully to confirm all rows are captured. There is no page 3.",
+    "Step 11: Call done with the complete list of all products and their order counts from both pages."
+  ],
+  "final_result_summary": "Here are the orders for each product from the Product Sales analytics for the date range Feb 1, 2026 to Feb 28, 2026:\n\n**Page 1:**\n1. Acoustic Adventure - 180 orders\n2. Acoustic Adventure (Order Bump) - 62 orders\n3. Acoustic Adventure (Payment Plan) - 20 orders\n4. Coaching Club (Annual) - 0 orders\n5. Coaching Club (Early Annual) - 2 orders\n6. Coaching Club (Monthly - 1st Month Free) - 92 orders\n7. Coaching Club (Monthly - 3 Months Free) - 12 orders\n8. Coaching Club (Monthly) - 0 orders\n9. Electric Elevation - 36 orders\n10. Electric Elevation (Order Bump) - 46 orders\n\n**Page 2:**\n11. Electric Elevation (Payment Plan) - 9 orders\n12. Learn Practice Play - 200 orders\n13. Learn Practice Play (Order Bump) - 1 orders\n14. Learn Practice Play (Payment Plan) - 29 orders\n15. Loop School - 24 orders\n16. Loop School (Order Bump) - 31 orders\n17. Next Level Playing - 145 orders\n18. Next Level Playing (Order Bump) - 74 orders\n19. Next Level Playing (Payment Plan) - 14 orders\n\n**Total: 19 products**"
+}
